@@ -40,10 +40,10 @@ class SimpleEnglish < Formula
     ENV["GEM_PATH"] = libexec
     resources.each do |r|
       system "gem", "install", "--no-document", "--ignore-dependencies",
-        r.download_name
+        r.cached_download
     end
     system "gem", "install", "--no-document", "--ignore-dependencies",
-      cached_download.basename
+      cached_download
 
     # The gem resolves Java itself: PATH, then the Homebrew opt path,
     # then SE_JAVA. openjdk@17 is keg-only, so hand the resolution over
