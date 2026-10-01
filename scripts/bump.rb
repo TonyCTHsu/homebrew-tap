@@ -41,7 +41,7 @@ File.write(FORMULA, updated)
 
 system("git", "checkout", "-q", "-b", branch) || abort("cannot branch")
 system("git", "add", FORMULA) || abort("cannot stage")
-system("git", "commit", "-q", "-m", "--no-edit", "simple-english #{current} -> #{latest}") ||
+system("git", "commit", "-q", "-m", "simple-english #{current} -> #{latest}") ||
   abort("cannot commit")
 system("git", "push", "-q", "origin", branch) || abort("cannot push")
 system("gh", "pr", "create", "--fill", "--draft") || abort("cannot open the pull request")
