@@ -1,8 +1,8 @@
 class SimpleEnglish < Formula
   desc "Lint Markdown prose with the SimpleEnglish Plain-mode rules"
   homepage "https://github.com/TonyCTHsu/simple-english"
-  url "https://rubygems.org/gems/simple_english-0.3.0.gem"
-  sha256 "cc69dd63a84113f4218387760d71c0f40347033361c656b152bc3c5d8baede67"
+  url "https://rubygems.org/gems/simple_english-0.4.0.gem"
+  sha256 "8343ea07a1cc614ef04d1dff7e1694e69d458b139611ff558f062106614140d3"
   license "MIT"
 
   depends_on "openjdk@17"
@@ -57,16 +57,6 @@ class SimpleEnglish < Formula
     sha256 "e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73"
   end
 
-  resource "rubyzip" do
-    url "https://rubygems.org/gems/rubyzip-3.7.0.gem"
-    sha256 "65c19294da75297a939006f3516deacc33185fbd721ff1954f7a231db6d3e121"
-  end
-
-  resource "rexml" do
-    url "https://rubygems.org/gems/rexml-3.4.4.gem"
-    sha256 "19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142"
-  end
-
   def install
     ENV["GEM_HOME"] = libexec
     ENV["GEM_PATH"] = libexec
@@ -87,10 +77,9 @@ class SimpleEnglish < Formula
 
   def caveats
     <<~EOS
-      Run `se setup` once first: it downloads the pinned LanguageTool
-      (about 300 MB) and verifies Java. Then keep a warm daemon with:
-
-        brew services start simple-english
+      The first `brew services start simple-english` downloads the
+      pinned LanguageTool (about 300 MB) and then keeps a warm daemon.
+      Run `se setup` ahead of time to download it first.
     EOS
   end
 
@@ -103,6 +92,6 @@ class SimpleEnglish < Formula
   end
 
   test do
-    assert_match "Lint Markdown", shell_output("#{bin}/se --help")
+    assert_match version.to_s, shell_output("#{bin}/se version")
   end
 end
