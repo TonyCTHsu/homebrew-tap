@@ -14,10 +14,10 @@ class SimpleEnglish < Formula
   end
 
   resource "tree_sitter_language_pack" do
-    # The ruby-platform gem: compiles from source on every platform.
-    # The default download is a prebuilt arm64-darwin binary.
-    url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0-ruby.gem"
-    sha256 "f8dc62d5249bf7dbf05c7f8a82028092547c3d8c0ed936dd105a6f0fe5d7140a"
+    # The plain (ruby-platform) gem: compiles from source on every
+    # platform. The platform-suffixed name would be a prebuilt binary.
+    url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0.gem"
+    sha256 "2ab298478a2390f0fba2f05e32325bb5b7c2f5f9674019d209de582446329d7d"
   end
 
   resource "thor" do
