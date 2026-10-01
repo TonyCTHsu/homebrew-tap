@@ -30,6 +30,28 @@ class SimpleEnglish < Formula
     end
   end
 
+  # tree_sitter_language_pack needs sorbet-runtime; that chain reaches
+  # benchmark, minitest, drb. Homebrew's Ruby ships none of them.
+  resource "sorbet-runtime" do
+    url "https://rubygems.org/gems/sorbet-runtime-0.6.13508.gem"
+    sha256 "011ee266adead459077ebc0058d36aeb75d6c90968db8524916050ce3c62e526"
+  end
+
+  resource "benchmark" do
+    url "https://rubygems.org/gems/benchmark-0.5.0.gem"
+    sha256 "465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c"
+  end
+
+  resource "minitest" do
+    url "https://rubygems.org/gems/minitest-6.0.6.gem"
+    sha256 "153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1"
+  end
+
+  resource "drb" do
+    url "https://rubygems.org/gems/drb-2.2.3.gem"
+    sha256 "0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373"
+  end
+
   resource "thor" do
     url "https://rubygems.org/gems/thor-1.5.0.gem"
     sha256 "e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73"
