@@ -87,9 +87,8 @@ class SimpleEnglish < Formula
 
   def caveats
     <<~EOS
-      The daemon downloads the pinned LanguageTool (about 300 MB) on its
-      first start. Run `se setup` once to do that ahead of time, or just
-      start it and wait:
+      Run `se setup` once first: it downloads the pinned LanguageTool
+      (about 300 MB) and verifies Java. Then keep a warm daemon with:
 
         brew services start simple-english
     EOS
@@ -104,6 +103,6 @@ class SimpleEnglish < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/se version")
+    assert_match "Lint Markdown", shell_output("#{bin}/se --help")
   end
 end
