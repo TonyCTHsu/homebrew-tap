@@ -1,8 +1,9 @@
 name: bump
 
+# The Release workflow in simple-english fires this right after it
+# publishes the gem. workflow_dispatch covers a manual rerun.
+
 on:
-  schedule:
-    - cron: "23 6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -18,11 +19,16 @@ jobs:
 
       - name: Rewrite the formula when a newer gem is out
         id: bump
-        # The script prints "simple-english A -> B" only after a
-        # rewrite. Nothing printed means the formula is current, and
-        # the pull request step is skipped.
+        # The dispatch can beat the rubygems index: the workflow may
+        # run before the new version shows up. Poll for up to two
+        # minutes, then end as a no-op.
         run: |
-          msg="$(ruby scripts/bump.rb)"
+          msg=""
+          for _ in $(seq 1 12); do
+            msg="$(ruby scripts/bump.rb)"
+            [ -n "$msg" ] && break
+            sleep 10
+          done
           if [ -n "$msg" ]; then
             echo "transition=$msg" >> "$GITHUB_OUTPUT"
             echo "version=${msg##* -> }" >> "$GITHUB_OUTPUT"
