@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Open a pull request when rubygems serves a newer simple_english
-# than the formula pins. Bumps the gem url and sha256 only: the
-# resource gems drift rarely, and ci catches drift by failing to
-# install or test. Exits 0 when the formula is current or a bump
-# pull request already exists.
+# Rewrite the formula for the newest simple_english on rubygems.
+# Bumps the gem url and sha256 only. Prints nothing and exits 0 when
+# the formula is current. Prints "simple-english A -> B" after a
+# rewrite: bump.yml turns that line into a branch and a draft pull
+# request. This script never runs git or gh.
 
 require "digest"
 require "json"
@@ -22,15 +22,14 @@ body = File.read(FORMULA)
 current = body[/simple_english-(\d+(?:\.\d+)*)\.gem/, 1]
 latest = rubygems("/api/v1/gems/simple_english.json")["version"]
 abort "rubygems served no version" if latest.to_s.empty?
+# The version flows into a shell variable in bump.yml, so it must
+# stay a plain number list.
+abort "rubygems served an odd version: #{latest}" unless
+  latest.match?(/\A\d+(?:\.\d+)*\z/)
 exit 0 if latest == current
-
-branch = "bump/v#{latest}"
-open_prs = `gh pr list --repo #{ENV.fetch("GITHUB_REPOSITORY", "TonyCTHsu/homebrew-tap")} --head #{branch} --state open`
-exit 0 unless $?.success? && open_prs.strip.empty?
 
 gem_url = "https://rubygems.org/gems/simple_english-#{latest}.gem"
 sha = Digest::SHA256.hexdigest(URI.open(gem_url).read)
-
 updated = body
   .sub(%r{url "https://rubygems\.org/gems/simple_english-[\d.]+\.gem"},
     %(url "#{gem_url}"))
@@ -38,11 +37,4 @@ updated = body
   # resource blocks come after it.
   .sub(/sha256 "[0-9a-f]{64}"/, %(sha256 "#{sha}"))
 File.write(FORMULA, updated)
-
-system("git", "checkout", "-q", "-b", branch) || abort("cannot branch")
-system("git", "add", FORMULA) || abort("cannot stage")
-system("git", "commit", "-q", "-m", "simple-english #{current} -> #{latest}") ||
-  abort("cannot commit")
-system("git", "push", "-q", "origin", branch) || abort("cannot push")
-system("gh", "pr", "create", "--fill", "--draft") || abort("cannot open the pull request")
-puts "simple-english #{current} -> #{latest}: pull request open"
+puts "simple-english #{current} -> #{latest}"

@@ -16,8 +16,33 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Open a pull request when a newer gem is out
+      - name: Set up the Git user
+        uses: Homebrew/actions/setup-git-user@master
+
+      - name: Rewrite the formula when a newer gem is out
+        id: bump
+        # The script prints "simple-english A -> B" only after a
+        # rewrite. Nothing printed means the formula is current.
+        run: |
+          msg="$(ruby scripts/bump.rb)"
+          if [ -n "$msg" ]; then
+            echo "transition=$msg" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open a pull request
+        if: steps.bump.outputs.transition != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: ruby scripts/bump.rb
+        run: |
+          transition="${{ steps.bump.outputs.transition }}"
+          version="${transition##* -> }"
+          branch="bump/v${version}"
+          if [ -n "$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --state open)" ]; then
+            echo "a bump pull request is already open"
+            exit 0
+          fi
+          git checkout -q -b "$branch"
+          git add Formula/simple-english.rb
+          git commit -q -m "${transition}"
+          git push -q origin "$branch"
+          gh pr create --fill --draft
