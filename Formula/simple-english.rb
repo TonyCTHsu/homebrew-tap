@@ -13,11 +13,21 @@ class SimpleEnglish < Formula
     regex(/"version":\s*"([^"]+)"/)
   end
 
-  resource "tree_sitter_language_pack" do
-    # The plain (ruby-platform) gem: compiles from source on every
-    # platform. The platform-suffixed name would be a prebuilt binary.
-    url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0.gem"
-    sha256 "2ab298478a2390f0fba2f05e32325bb5b7c2f5f9674019d209de582446329d7d"
+  # Prebuilt darwin gems. The source (-ruby) gem needs the rb_sys
+  # build gem and compiles every tree-sitter grammar: far too slow for
+  # an install. ponytail: darwin only. Linux support needs the -ruby
+  # gem plus an rb_sys resource.
+  on_arm do
+    resource "tree_sitter_language_pack" do
+      url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0-arm64-darwin.gem"
+      sha256 "b5e6899bedaa750f030a12bfd5db96fe9ed6a0617eee37119c0ffafd49d5baae"
+    end
+  end
+  on_intel do
+    resource "tree_sitter_language_pack" do
+      url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0-x86_64-darwin.gem"
+      sha256 "8c33f147b46b768a8c333fe8ee3924279feed0c39819232cd92a73f8d34826d6"
+    end
   end
 
   resource "thor" do
