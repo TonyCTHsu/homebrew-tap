@@ -16,33 +16,24 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Set up the Git user
-        uses: Homebrew/actions/setup-git-user@master
-
       - name: Rewrite the formula when a newer gem is out
         id: bump
         # The script prints "simple-english A -> B" only after a
-        # rewrite. Nothing printed means the formula is current.
+        # rewrite. Nothing printed means the formula is current, and
+        # the pull request step is skipped.
         run: |
           msg="$(ruby scripts/bump.rb)"
           if [ -n "$msg" ]; then
             echo "transition=$msg" >> "$GITHUB_OUTPUT"
+            echo "version=${msg##* -> }" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Open a pull request
-        if: steps.bump.outputs.transition != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          transition="${{ steps.bump.outputs.transition }}"
-          version="${transition##* -> }"
-          branch="bump/v${version}"
-          if [ -n "$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --state open)" ]; then
-            echo "a bump pull request is already open"
-            exit 0
-          fi
-          git checkout -q -b "$branch"
-          git add Formula/simple-english.rb
-          git commit -q -m "${transition}"
-          git push -q origin "$branch"
-          gh pr create --fill --draft
+      - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        if: steps.bump.outputs.version != ''
+        with:
+          branch: bump/v${{ steps.bump.outputs.version }}
+          title: ${{ steps.bump.outputs.transition }}
+          commit-message: ${{ steps.bump.outputs.transition }}
+          add-paths: Formula/simple-english.rb
+          draft: true
+          sign-commits: true
