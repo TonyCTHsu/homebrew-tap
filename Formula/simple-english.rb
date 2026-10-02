@@ -1,8 +1,8 @@
 class SimpleEnglish < Formula
   desc "Lint Markdown prose with the SimpleEnglish Plain-mode rules"
   homepage "https://github.com/TonyCTHsu/simple-english"
-  url "https://rubygems.org/gems/simple_english-0.4.1.gem"
-  sha256 "c00abf949c4749e1dc79c8a7d654fadd489ce6542b8e9feb2bc6a9152dd19c51"
+  url "https://rubygems.org/gems/simple_english-0.4.2.gem"
+  sha256 "d1e4935c32c248e4d7fe0fda7097ec5100b35b581d5212bdd494d4c73488f653"
   license "MIT"
 
   depends_on "openjdk@17"
