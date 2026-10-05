@@ -5,28 +5,26 @@ class SimpleEnglish < Formula
   sha256 "d1e4935c32c248e4d7fe0fda7097ec5100b35b581d5212bdd494d4c73488f653"
   license "MIT"
 
-  depends_on "openjdk@17"
-  depends_on "ruby"
-
   livecheck do
     url "https://rubygems.org/api/v1/gems/simple_english.json"
-    regex(/"version":\s*"([^"]+)"/)
+    regex(/"version":\s*"([^"]+)"/i)
   end
+
+  depends_on "openjdk@17"
+  depends_on "ruby"
 
   # Prebuilt darwin gems. The source (-ruby) gem needs the rb_sys
   # build gem and compiles every tree-sitter grammar: far too slow for
   # an install. ponytail: darwin only. Linux support needs the -ruby
   # gem plus an rb_sys resource.
-  on_arm do
-    resource "tree_sitter_language_pack" do
+  resource "tree_sitter_language_pack" do
+    on_arm do
       url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0-arm64-darwin.gem"
       sha256 "b5e6899bedaa750f030a12bfd5db96fe9ed6a0617eee37119c0ffafd49d5baae"
     end
-  end
-  on_intel do
-    resource "tree_sitter_language_pack" do
+    on_intel do
       url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0-x86_64-darwin.gem"
-      sha256 "8c33f147b46b768a8c333fe8ee3924279feed0c39819232cd92a73f8d34826d6"
+      sha256 "8c33f147b46b768a8c333fe8ee3924279feed0c39819232cd92a73d8d34826d6"
     end
   end
 
@@ -70,7 +68,7 @@ class SimpleEnglish < Formula
     # The gem resolves Java itself: PATH, then the Homebrew opt path,
     # then SE_JAVA. openjdk@17 is keg-only, so hand the resolution over
     # directly instead of relying on the opt-path guess.
-    java_bin = Formula["openjdk@17"].opt_bin/"java"
+    java_bin = formula_opt_bin("openjdk@17")/"java"
     (bin/"se").write_env_script libexec/"bin/se",
       GEM_HOME: libexec, GEM_PATH: libexec, SE_JAVA: java_bin
   end

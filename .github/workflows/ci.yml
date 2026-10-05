@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  formula:
+    # The tree_sitter resources are darwin-only, so the formula
+    # cannot install on Linux runners.
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@e99025eb970cfa124b8284a35463d87426917478 # 2026.09.28.1
+
+      - name: Set up the Git user
+        uses: Homebrew/actions/git-user-config@e99025eb970cfa124b8284a35463d87426917478 # 2026.09.28.1
+
+      - name: Test the formulae
+        run: |
+          brew test-bot --only-cleanup-before
+          brew test-bot --only-tap-syntax
+          brew test-bot --only-formulae
