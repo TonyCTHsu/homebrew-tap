@@ -33,7 +33,7 @@ sha = Digest::SHA256.hexdigest(Net::HTTP.get(URI(gem_url)))
 # resource blocks come after it.
 updated = body
           .sub(%r{url "https://rubygems\.org/gems/simple_english-[\d.]+\.gem"},
-               %Q{url "#{gem_url}"})
-          .sub(/sha256 "[0-9a-f]{64}"/, %Q{sha256 "#{sha}"})
+               %Q(url "#{gem_url}"))
+          .sub(/sha256 "[0-9a-f]{64}"/, %Q(sha256 "#{sha}"))
 File.write(FORMULA, updated)
 puts "simple-english #{current} -> #{latest}"
