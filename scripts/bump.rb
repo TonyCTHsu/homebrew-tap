@@ -10,9 +10,8 @@
 require "digest"
 require "json"
 require "net/http"
-require "open-uri"
 
-FORMULA = File.expand_path("../Formula/simple-english.rb", __dir__)
+FORMULA = File.expand_path("../Formula/simple-english.rb", __dir__).freeze
 
 def rubygems(path)
   JSON.parse(Net::HTTP.get(URI("https://rubygems.org#{path}")))
@@ -29,12 +28,12 @@ abort "rubygems served an odd version: #{latest}" unless
 exit 0 if latest == current
 
 gem_url = "https://rubygems.org/gems/simple_english-#{latest}.gem"
-sha = Digest::SHA256.hexdigest(URI.open(gem_url).read)
+sha = Digest::SHA256.hexdigest(Net::HTTP.get(URI(gem_url)))
+# The formula's own sha256 is the first one in the file. The
+# resource blocks come after it.
 updated = body
-  .sub(%r{url "https://rubygems\.org/gems/simple_english-[\d.]+\.gem"},
-    %(url "#{gem_url}"))
-  # The formula's own sha256 is the first one in the file. The
-  # resource blocks come after it.
-  .sub(/sha256 "[0-9a-f]{64}"/, %(sha256 "#{sha}"))
+          .sub(%r{url "https://rubygems\.org/gems/simple_english-[\d.]+\.gem"},
+               %Q{url "#{gem_url}"})
+          .sub(/sha256 "[0-9a-f]{64}"/, %Q{sha256 "#{sha}"})
 File.write(FORMULA, updated)
 puts "simple-english #{current} -> #{latest}"
