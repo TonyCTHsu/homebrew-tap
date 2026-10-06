@@ -21,8 +21,8 @@ def rubygems(path)
 end
 
 body = File.read(FORMULA)
-current = body[/^  version "([^"]+)"/, 1]
-abort "error: the formula declares no version" if current.nil?
+current = body[/simple_english-(\d+(?:\.\d+)*)-/, 1]
+abort "error: the formula declares no simple_english version" if current.nil?
 
 # The versions endpoint lists every platform build; the gems endpoint
 # tracks the platformless ruby build, which no longer ships.
@@ -35,20 +35,21 @@ abort "error: rubygems served an odd version: #{latest}" unless
   latest.match?(/\A\d+(?:\.\d+)*\z/)
 exit 0 if latest == current
 
-published = versions.select { |v| v["number"] == latest }
-  .map { |v| v["platform"] }
+published = versions.select { |v| v["number"] == latest }.map { |v| v["platform"] }
 missing = PLATFORMS - published
-abort "error: rubygems published #{latest} for #{published.join(", ")}, " \
-     "missing #{missing.join(", ")}" unless missing.empty?
+unless missing.empty?
+  abort "error: rubygems published #{latest} for #{published.join(", ")}, " \
+        "missing #{missing.join(", ")}"
+end
 
-updated = body.sub(/^  version "[^"]+"$/, %(  version "#{latest}"))
+updated = body
 PLATFORMS.each do |platform|
   gem_url = "https://rubygems.org/gems/simple_english-#{latest}-#{platform}.gem"
   sha = Digest::SHA256.hexdigest(Net::HTTP.get(URI(gem_url)))
-  pair = /url "https:\/\/rubygems\.org\/gems\/simple_english-[\d.]+-#{platform}\.gem"\n(\s*)sha256 "[0-9a-f]{64}"/
+  pair = %r{url "https://rubygems\.org/gems/simple_english-[\d.]+-#{platform}\.gem"\n(\s*)sha256 "[0-9a-f]{64}"}
   match = updated.match(pair)
   abort "error: the formula has no #{platform} pair" if match.nil?
-  updated = updated.sub(pair, %(url "#{gem_url}") + "\n#{match[1]}sha256 \"#{sha}\"")
+  updated = updated.sub(pair, %Q(url "#{gem_url}") + "\n#{match[1]}sha256 \"#{sha}\"")
 end
 File.write(FORMULA, updated)
 puts "simple-english #{current} -> #{latest}"

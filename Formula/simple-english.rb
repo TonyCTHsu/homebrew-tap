@@ -1,11 +1,10 @@
 class SimpleEnglish < Formula
   desc "Lint Markdown prose with the SimpleEnglish Plain-mode rules"
   homepage "https://github.com/TonyCTHsu/simple-english"
-  version "0.6.0"
+  url "https://rubygems.org/gems/simple_english-0.6.0-arm64-darwin.gem"
+  sha256 "391c3949ead5c54db910707ab713469ee5ed47a43e8666dee13a3feb8e46eb6f"
   license "MIT"
 
-  # The gem publishes platform builds only. No x86_64-darwin build
-  # exists, so Intel Macs cannot install it.
   livecheck do
     url :homepage
     strategy :github
@@ -14,12 +13,10 @@ class SimpleEnglish < Formula
 
   depends_on "ruby"
 
+  # The gem publishes arm64-darwin only for macOS; no x86_64-darwin
+  # build exists.
   on_macos do
     depends_on arch: :arm
-    on_arm do
-      url "https://rubygems.org/gems/simple_english-0.6.0-arm64-darwin.gem"
-      sha256 "391c3949ead5c54db910707ab713469ee5ed47a43e8666dee13a3feb8e46eb6f"
-    end
   end
   on_linux do
     on_arm do
