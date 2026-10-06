@@ -12,11 +12,8 @@ jobs:
   formula:
     strategy:
       fail-fast: false
-      # The formula serves arm64 darwin, aarch64 linux, and x86_64
-      # linux. GitHub has no arm64 linux runner, so the other two
-      # cover the install paths.
       matrix:
-        os: [macos-15, ubuntu-24.04]
+        os: [macos-15, ubuntu-24.04, ubuntu-22.04-arm]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
