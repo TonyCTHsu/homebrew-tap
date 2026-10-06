@@ -10,9 +10,14 @@ permissions:
 
 jobs:
   formula:
-    # The tree_sitter resources are darwin-only, so the formula
-    # cannot install on Linux runners.
-    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      # The formula serves arm64 darwin, aarch64 linux, and x86_64
+      # linux. GitHub has no arm64 linux runner, so the other two
+      # cover the install paths.
+      matrix:
+        os: [macos-15, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
       - name: Set up Homebrew

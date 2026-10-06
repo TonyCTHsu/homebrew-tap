@@ -1,30 +1,51 @@
 class SimpleEnglish < Formula
   desc "Lint Markdown prose with the SimpleEnglish Plain-mode rules"
   homepage "https://github.com/TonyCTHsu/simple-english"
-  url "https://rubygems.org/gems/simple_english-0.5.0.gem"
-  sha256 "a5ae50840c84499d6bf109ea730d21ccfd55a308a26218c4e7cc79bfdf00d434"
+  version "0.6.0"
   license "MIT"
 
+  # The gem publishes platform builds only. No x86_64-darwin build
+  # exists, so Intel Macs cannot install it.
   livecheck do
-    url "https://rubygems.org/api/v1/gems/simple_english.json"
-    regex(/"version":\s*"([^"]+)"/i)
+    url :homepage
+    strategy :github
+    regex(/^v?(\d+(?:\.\d+)*)$/i)
   end
 
-  depends_on "openjdk@17"
   depends_on "ruby"
 
-  # Prebuilt darwin gems. The source (-ruby) gem needs the rb_sys
-  # build gem and compiles every tree-sitter grammar: far too slow for
-  # an install. ponytail: darwin only. Linux support needs the -ruby
-  # gem plus an rb_sys resource.
-  resource "tree_sitter_language_pack" do
+  on_macos do
+    depends_on arch: :arm
     on_arm do
+      url "https://rubygems.org/gems/simple_english-0.6.0-arm64-darwin.gem"
+      sha256 "391c3949ead5c54db910707ab713469ee5ed47a43e8666dee13a3feb8e46eb6f"
+    end
+  end
+  on_linux do
+    on_arm do
+      url "https://rubygems.org/gems/simple_english-0.6.0-aarch64-linux.gem"
+      sha256 "fdc2297c55529614cb2268347b8ccd18123433f5cb61cd903a46544cbe91ede8"
+    end
+    on_intel do
+      url "https://rubygems.org/gems/simple_english-0.6.0-x86_64-linux.gem"
+      sha256 "8f4858571694c9e57841d64ff5faafda56d12bb43179d7647f3dc7de36d73d5f"
+    end
+  end
+
+  resource "tree_sitter_language_pack" do
+    on_macos do
       url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0-arm64-darwin.gem"
       sha256 "b5e6899bedaa750f030a12bfd5db96fe9ed6a0617eee37119c0ffafd49d5baae"
     end
-    on_intel do
-      url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0-x86_64-darwin.gem"
-      sha256 "8c33f147b46b768a8c333fe8ee3924279feed0c39819232cd92a73d8d34826d6"
+    on_linux do
+      on_arm do
+        url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0-aarch64-linux.gem"
+        sha256 "8b43f4c3d18705d4211a5dc0d9281f5e68616c8dd6b323df411b9ee026894f6f"
+      end
+      on_intel do
+        url "https://rubygems.org/gems/tree_sitter_language_pack-1.20.0-x86_64-linux.gem"
+        sha256 "ce5e910a1443afbc770eb6cd18d33b08327fed1ef721f6c9a15e0dfccf7327a4"
+      end
     end
   end
 
@@ -65,20 +86,8 @@ class SimpleEnglish < Formula
     system "gem", "install", "--no-document", "--ignore-dependencies",
       cached_download
 
-    # The gem resolves Java itself: PATH, then the Homebrew opt path,
-    # then SE_JAVA. openjdk@17 is keg-only, so hand the resolution over
-    # directly instead of relying on the opt-path guess.
-    java_bin = formula_opt_bin("openjdk@17")/"java"
     (bin/"se").write_env_script libexec/"bin/se",
-      GEM_HOME: libexec, GEM_PATH: libexec, SE_JAVA: java_bin
-  end
-
-  def caveats
-    <<~EOS
-      The first `brew services start simple-english` downloads the
-      pinned LanguageTool (about 300 MB) and then keeps a warm daemon.
-      Run `se setup` ahead of time to download it first.
-    EOS
+      GEM_HOME: libexec, GEM_PATH: libexec
   end
 
   service do
