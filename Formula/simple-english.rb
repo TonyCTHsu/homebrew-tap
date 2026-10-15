@@ -1,8 +1,8 @@
 class SimpleEnglish < Formula
   desc "Lint Markdown prose with the SimpleEnglish Plain-mode rules"
   homepage "https://github.com/TonyCTHsu/simple-english"
-  url "https://rubygems.org/gems/simple_english-0.9.0-arm64-darwin.gem"
-  sha256 "8e5f6a08803b2c0d0f09db113e826ab6560af36d8e5e0ba67774c2726dde13b3"
+  url "https://rubygems.org/gems/simple_english-0.10.0-arm64-darwin.gem"
+  sha256 "3273089afe6f834c56ba327ed86b0aa19f0771c177b0bf4ea9ce44416cf15c17"
   license "MIT"
 
   livecheck do
@@ -20,12 +20,12 @@ class SimpleEnglish < Formula
   end
   on_linux do
     on_arm do
-      url "https://rubygems.org/gems/simple_english-0.9.0-aarch64-linux.gem"
-      sha256 "97590cfc5f9b8fc0b5b26dfb1e6667f72257c68cf981638ad3a5647ac75a7aab"
+      url "https://rubygems.org/gems/simple_english-0.10.0-aarch64-linux.gem"
+      sha256 "667e3a67db17d197cf7052cda220ecc9d199339c24470025d79296095fccb1b1"
     end
     on_intel do
-      url "https://rubygems.org/gems/simple_english-0.9.0-x86_64-linux.gem"
-      sha256 "9225d50776d44affcbff9346ced5ca7eec6dbbca72cf7d4b0f066eec7c1ed07a"
+      url "https://rubygems.org/gems/simple_english-0.10.0-x86_64-linux.gem"
+      sha256 "7ca10016aa5cde198a5cdcf33aa6b1100d7873c875b92df67c70f2c05723ac0d"
     end
   end
 
