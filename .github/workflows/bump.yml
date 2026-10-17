@@ -36,19 +36,17 @@ jobs:
             echo "version=${msg##* -> }" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
-        id: app-token
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: toby
         if: steps.bump.outputs.version != ''
         with:
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          client-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
 
       - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         if: steps.bump.outputs.version != ''
         with:
-          token: ${{ steps.app-token.outputs.token }}
-          committer: toby-sidekick[bot] <${{ vars.APP_ID }}+toby-sidekick[bot]@users.noreply.github.com>
-          author: toby-sidekick[bot] <${{ vars.APP_ID }}+toby-sidekick[bot]@users.noreply.github.com>
+          token: ${{ steps.toby.outputs.token }}
           branch: bump/v${{ steps.bump.outputs.version }}
           title: ${{ steps.bump.outputs.transition }}
           commit-message: ${{ steps.bump.outputs.transition }}
