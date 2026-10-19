@@ -24,7 +24,7 @@ body = File.read(FORMULA)
 current = body[/simple_english-(\d+(?:\.\d+)*)-/, 1]
 abort "error: the formula declares no simple_english version" if current.nil?
 
-# The versions endpoint lists every platform build; the gems endpoint
+# The versions endpoint lists every platform build. The gems endpoint
 # tracks the platformless ruby build, which no longer ships.
 versions = rubygems("/api/v1/versions/simple_english.json")
 latest = versions.dig(0, "number")
@@ -37,10 +37,11 @@ exit 0 if latest == current
 
 published = versions.select { |v| v["number"] == latest }.map { |v| v["platform"] }
 missing = PLATFORMS - published
-unless missing.empty?
-  abort "error: rubygems published #{latest} for #{published.join(", ")}, " \
-        "missing #{missing.join(", ")}"
-end
+# A partial platform set reads as not-ready, not as failure: rubygems
+# serves this endpoint through a CDN, and one edge can still show the
+# last platform missing after the release verified it elsewhere.
+# Printing nothing makes bump.yml poll again.
+exit 0 unless missing.empty?
 
 updated = body
 PLATFORMS.each do |platform|
